@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+       xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="classpath:spring-config.xml"/>
+
+    <!-- From RabbitMQ To STDOUT -->
+    <int-amqp:channel id="fromRabbit" connection-factory="connectionFactory" message-driven="true"
+                      queue-name="${amqp.queue}"/>
+
+    <int:transformer input-channel="fromRabbit" output-channel="consoleOut" expression="'Received: ' + payload"/>
+
+    <int:delayer id="delayer" input-channel="fromRabbit" default-delay="3000" output-channel="consoleOut"/>
+
+    <int-stream:stdout-channel-adapter id="consoleOut" append-newline="true"/>
+
+</beans>

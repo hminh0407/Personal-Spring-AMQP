@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/integration
+        http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!-- Properties -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+        <property name="locations" ref="propertiesLocations"/>
+    </bean>
+
+    <util:list id="propertiesLocations">
+        <value>classpath:application.properties</value>
+        <value>file:///${CONFIG_OVERRIDE}</value>
+    </util:list>
+
+    <!-- RabbitMQ Config -->
+    <rabbit:connection-factory id="connectionFactory" addresses="${amqp.addresses}" username="${amqp.username}"
+                               password="${amqp.password}"/>
+    <rabbit:admin connection-factory="connectionFactory"/>
+    <rabbit:queue name="${amqp.queue}"/>
+
+    <!-- GLOBAL LOGGING -->
+    <!--<int:wire-tap pattern="*" channel="logger"/>
+    <int:logging-channel-adapter id="logger" log-full-message="true" level="INFO"/>-->
+
+</beans>
